@@ -1,0 +1,25 @@
+table {
+    margin-top: 30px;
+    font-family: arial, sans-serif;
+    border-collapse: collapse;
+    width: 100%;
+}
+
+th {
+    font-size: 24px;
+}
+
+td,
+th {
+    text-align: left;
+    padding: 20px 5px;
+
+    @media(max-width:450px) {
+        font-size: 12px;
+    }
+
+}
+
+tr:nth-child(even) {
+    background-color: #f8f8f8;
+}
