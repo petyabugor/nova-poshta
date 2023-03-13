@@ -1,8 +1,8 @@
 import './App.css';
-import Header from './components/Header/Header';
 import Home from './pages/Home/Home';
 import Offices from './pages/Offices/Offices';
 import { Routes, Route } from 'react-router-dom';
+import Header from './components/Header2/Header';
 
 function App() {
    return (
