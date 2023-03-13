@@ -3,13 +3,16 @@ import Forma from '../../common/Form/Forma';
 import styles from './styles.module.scss';
 import { useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import axios from 'axios';
+import { useDispatch, useSelector } from 'react-redux';
+
+import { fetchparcel } from '../../redux/slices/parcelSlice';
 
 function Home() {
+   const dispatch = useDispatch();
+   const { statusParcel, isLoading } = useSelector((state) => state.parcel);
    const isMounted = useRef(false);
    const [searchValue, setSearchValue] = useState('');
    const [valueButtonClick, setValueButtonClick] = useState('');
-   const [statusParcel, setStatusParcel] = useState([]);
    const [list, setList] = useState(JSON.parse(localStorage.getItem('TTN')) || []);
 
    useEffect(() => {
@@ -19,35 +22,18 @@ function Home() {
       isMounted.current = true;
    }, [list]);
 
-   const apiKey = '580c856ea51f60fb314b58ae09b7276b';
-   const url = 'https://api.novaposhta.ua/v2.0/json/';
+   const getParcel = async () => {
+      dispatch(fetchparcel(valueButtonClick));
+   };
    useEffect(() => {
-      fetch(url, {
-         method: 'POST',
-         headers: {
-            'Content-Type': 'application/json',
-         },
-         body: JSON.stringify({
-            apiKey: apiKey,
-            modelName: 'TrackingDocument',
-            calledMethod: 'getStatusDocuments',
-            methodProperties: {
-               Documents: [
-                  {
-                     DocumentNumber: valueButtonClick,
-                  },
-               ],
-            },
-         }),
-      })
-         .then((response) => response.json())
-         .then((res) => setStatusParcel(res.data));
+      getParcel(valueButtonClick);
    }, [valueButtonClick]);
 
    const changeValue = (val) => {
       setValueButtonClick(val);
       setSearchValue(val);
    };
+   console.log(valueButtonClick);
 
    return (
       <div className={styles.wrapper}>
@@ -60,10 +46,13 @@ function Home() {
             setValueButtonClick={setValueButtonClick}
          />
          <div className={styles.content}>
-            {list.length > 0 && valueButtonClick && (
+            {isLoading === 'success' && list.length > 0 && valueButtonClick && (
                <div className={styles.status}>
                   {statusParcel.map((val) => (
-                     <div className={styles.status_content}>
+                     <div
+                        key={val.Number}
+                        className={styles.status_content}
+                     >
                         <p>
                            {' '}
                            <b>Номер відстеження:</b> {val.Number}
@@ -95,10 +84,11 @@ function Home() {
                      <>
                         {list.map((val, i) => (
                            <Link
+                              key={i}
                               className={styles.ttn}
                               onClick={() => changeValue(val)}
                            >
-                              <p key={i}>{val}</p>
+                              <p className={valueButtonClick === val ? 'active' : ''}>{val}</p>
                            </Link>
                         ))}
 

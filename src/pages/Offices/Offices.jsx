@@ -1,49 +1,45 @@
 import React from 'react';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import styles from './styles.module.scss';
+import { fetchOffices } from '../../redux/slices/officesSlice';
+import Skeleton from './OfficesSceleton';
 
 function Offices() {
-   const [offices, setOffices] = useState([]);
+   const dispatch = useDispatch();
+   const { offices, isLoading } = useSelector((state) => state.offices);
 
-   const apiKey = '580c856ea51f60fb314b58ae09b7276b';
-   const url = 'https://api.novaposhta.ua/v2.0/json/';
-   let options = JSON.stringify({
-      apiKey: apiKey,
-      modelName: 'Address',
-      calledMethod: 'getWarehouses',
-      methodProperties: {
-         Limit: '200',
-      },
-   });
-
+   const getProducts = async () => {
+      dispatch(fetchOffices());
+   };
    useEffect(() => {
-      fetch(url, {
-         method: 'POST',
-         headers: {
-            'Content-Type': 'application/json',
-         },
-         body: options,
-      })
-         .then((response) => response.json())
-         .then((res) => setOffices(res.data));
+      getProducts();
    }, []);
+
    return (
       <div className={styles.wrapper}>
-         <table className={styles.table}>
-            <tr>
-               <th>Область</th>
-               <th>Населений пункт</th>
-               <th>Вага до</th>
-            </tr>
-
-            {offices.map((val) => (
+         {isLoading === 'loading' ? (
+            <div className="skeleton">
+               {[...new Array(22)].map((_, index) => (
+                  <Skeleton key={index} />
+               ))}
+            </div>
+         ) : (
+            <table className={styles.table}>
                <tr>
-                  <td>{val.SettlementAreaDescription}</td>
-                  <td>{val.ShortAddress}</td>
-                  <td>{val.TotalMaxWeightAllowed} кг</td>
+                  <th>Область</th>
+                  <th>Населений пункт</th>
+                  <th>Вага до</th>
                </tr>
-            ))}
-         </table>
+               {offices.map((val) => (
+                  <tr>
+                     <td>{val.SettlementAreaDescription}</td>
+                     <td>{val.ShortAddress}</td>
+                     <td>{val.TotalMaxWeightAllowed} кг</td>
+                  </tr>
+               ))}
+            </table>
+         )}
       </div>
    );
 }

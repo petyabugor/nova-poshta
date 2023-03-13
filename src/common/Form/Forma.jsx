@@ -36,7 +36,6 @@ function Forma({
             <div className={styles.inputWrapper}>
                <input
                   className={styles.input}
-                  /* minLength={14} */
                   value={searchValue}
                   onChange={(event) => setSearchValue(event.target.value)}
                   placeholder="Введіть номер ТТН"
